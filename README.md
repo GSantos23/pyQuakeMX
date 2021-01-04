@@ -1,4 +1,4 @@
-# pyUSGS
+# pyQuakeMX
 Web Scrapping from Servicio Meteorologico Nacional to obtain info about earthquakes using the terminal
 
 Wishlist:
