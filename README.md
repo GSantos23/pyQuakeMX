@@ -1,5 +1,5 @@
 # pyUSGS
-Web Scrapping from USGS to obtain info about earthquakes using the terminal
+Web Scrapping from Servicio Meteorologico Nacional to obtain info about earthquakes using the terminal
 
 Wishlist:
 
