@@ -1,8 +1,10 @@
 '''
-pyQuakeMX
+pyQuakeMX ======================================================================
 
 This little program allow you to obtain earquake information in Mexico
 Using BeautifulSoup as a webscrapping library to obtain unam data
+
+================================================================================
 
 Implementations 
 
@@ -11,9 +13,10 @@ Implementations
 [ ]  = In progress
 *    = To try first 
 
-[] Display last earthquake
-[] Display list of earquakes (around 3 days)
+[X] Display last earthquake
+[~] Display list of earquakes (around 3 days)
 [] Display intensity chart  (or just show unam scale from parser)
+[] Create CSV file for data
 * Send notification via sms/discord/signal/telegram about earthquake in fav zone
 * Fav Zone will be a file where you put preferred location
 '''
@@ -30,10 +33,9 @@ import re
 # Delete unwanted code
 # Language function
 # Add intensity category (either unam scale or international scale)
-# Search by State function
 # Pretty rpinting, fstring
 # Good comments
-# executable script or leave as a module
+# Executable script or leave as a module
 
 def welcomePrinter():
     '''
@@ -44,12 +46,11 @@ def welcomePrinter():
 
     '''
     print('*'*45)
-    print(''' Welcome to pyQuakeMX
-        Please Select one the following options:
-        1) Display last earhquake
-        2) Display list of earthquakes
-        3) Type State Abbreviations
-        4) Exit
+    print(''' pyQuakeMX
+        Selecciona una de las siguientes opciones:
+        1) Mostrar ultimo sismo
+        2) Mostrar lista de sismos
+        3) Exit
             ''')
     print('*'*45)
 
@@ -58,7 +59,7 @@ def listEarthquake():
     url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
     page = requests.get(url).text
 
-    # Parse
+    # Parse code
     html = bs(page, 'lxml') # was lxml
     # To print html source code
     #print(html)
@@ -73,7 +74,7 @@ def listEarthquake():
     # Note to myself, apparently around 23:30 MST class 1days dissappears
     # Try to add like a time function to change 1days to 2days in the future
     quake1 = html.find('tr', class_ = '1days') #1days
-    print(quake1.text)
+    #print(quake1.text)
     # Prints info using id= instead of string concatenation
     # Add intesity marker (look for usgs term) green: weak, orange: medium, red: intense
     print('Último Sismo =====================================================')
@@ -94,6 +95,92 @@ def listEarthquake():
     #degree Symbol = u/'00BO'
     print("Latitud, Longitud: " + latitud + "\u00B0 , " + longitud + "\u00B0")
 
+    print('*******************************************************************')
+    days = ['1days', '2days' ,'3days']
+    # days[0:]
+    quakeAll = len(html.find_all('tr', class_ = days[0])) 
+    '''
+    for item in range(quakeAll):
+    	#emptyDate.extend('date1_' + item)
+    	x = item + 1
+    	#print('date_1_' + str(x))
+    	emptyDate.append('date_1_' + str(x))
+
+	'''
+    print(quakeAll) # Prints number of eathquake per days
+    # Variables for three days =================================================
+    # Sources to how to create more efficient way for multiple lists
+    # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
+    # https://www.geeksforgeeks.org/python-initializing-multiple-lists/
+    date1Lst = []
+    time1Lst = []
+    magn1Lst = []
+    latt1Lst = []
+    long1Lst = []
+    prof1Lst = []
+    epic1Lst = []
+    
+    date2Lst = []
+    time2Lst = []
+    magn2Lst = []
+    latt2Lst = []
+    long2Lst = []
+    prof2Lst = []
+    epic2Lst = []
+    
+    date3Lst = []
+    time3Lst = []
+    magn3Lst = []
+    latt3Lst = []
+    long3Lst = []
+    prof3Lst = []
+    epic3Lst = []
+    # ==========================================================================
+
+    # https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
+    # https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
+    # This part extract all ids from website
+    #texto = '<span id="foo"></span> <div id="bar"></div>'
+    pool = bs(page, 'lxml')
+    result = []
+    rslLoc = []
+    rslPrf = []
+    # location = html.find(id='epi_1_1').text
+
+    # idea: only allow a set of 7 variables instead of 21 (More slow)
+    # By default show the list of current day
+    # Ask user to select either today, yesterday, or day before yesterday
+    # In that way you only generate 7 lists for specific day
+
+    # try using half id name to verify if identiy all similar, Original: True
+    # ^mag_\d+
+    for tag in pool.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
+        result.append(tag['id'])
+
+    # For some reason is not finding epicenter tag
+    for tag2 in pool.findAll('td',{'id':re.compile('^epi_1_\d+')}) :
+        rslLoc.append(tag2['id'])
+
+    for tag3 in pool.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
+        rslPrf.append(tag3['id'])               
+    
+    print(rslLoc)
+    ter = html.find(id='epi_1_40').text
+    print(ter)
+
+    for i in range(quakeAll):
+    	magnitudes = html.find(id=result[i]).text
+    	print("Magnitud: " +  magnitudes) 
+    	profundidades = html.find(id=rslPrf[i]).text
+    	print("Profundidad: " +  profundidades)
+    	print('=========================')
+
+
+    #for last in quakeAll: 
+    #	dateAll = html.findAll(id='epi_1_')
+    #	print(dateAll)
+        #print(last.text)
+        #print(dateAll.text)
     '''
     # OLD WAY
     date      =	info[0] + quake1.text[5:16]
@@ -130,10 +217,7 @@ def listEarthquake():
 
 
 
-
-
-
-# To allow to use the program as a module
+# To allow to use the program as a module ======================================
 if __name__ == '__main__':
 	listEarthquake()
 
