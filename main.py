@@ -6,12 +6,12 @@ Using BeautifulSoup as a webscrapping library to obtain unam data
 
 ================================================================================
 
-Implementations 
+Implementations
 
 [X[] = Done
 [~]  = Half way
 [&]  = In progress
-*    = To try first 
+*    = To try first
 
 [X] Display last earthquake
 [~] Display list of earquakes (around 3 days)
@@ -54,6 +54,45 @@ def welcomePrinter():
             ''')
     print('*'*45)
 
+def lastEarhquake():
+    '''
+    Displays last eathquake information
+	No arguments
+	Returns:
+		date
+		time
+		magnitute
+		coordinates
+		depth
+		location
+    '''
+
+    # Website of UNAM for earthquakes
+    url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
+    info = requests.get(url).text
+    # Read website into code (parse)
+    source = bs(info, 'lxml')
+    print('Último Sismo ======================================================')
+    date     = source.find(id='date_1_1').text
+    time	 = source.find(id='time_1_1').text
+    magnitud = source.find(id='mag_1_1').text
+    latitud  = source.find(id='lat_1_1').text
+    longitud = source.find(id='lon_1_1').text
+    depth	 = source.find(id='prof_1_1').text
+    location = source.find(id='epi_1_1').text
+
+    print('Fecha: ' + date)
+    print('Hora: ' + time)
+    print('Magnitud: ' +  magnitud)
+    print('Epicentro --')
+    #degree Symbol = 'u00BO'
+    print('Latitud: ' + latitud + '\u00B0')
+    print('Longitud: ' + longitud + '\u00B0')
+    print('Localización: ' + location)
+    print('Profundidad ' + depth)
+    print('===================================================================')
+
+
 def listEarthquake():
 
     welcomePrinter()
@@ -64,45 +103,29 @@ def listEarthquake():
     html = bs(page, 'lxml') # was lxml
     # To print html source code
     #print(html)
-    
+
     # Print title of website
     test = html.find('h1', class_ = 'hidden menu-title-xs')
 
     # Replace tilde issue in html
     print(test.text[:15] + 'Ó' + test.text[17:])
 
-    # Print 1 earhquake
-    info = ['Fecha: ', 'Magnitud: ', 'Hora: ', 'Latitud: ', 'Longitud: ', 'Profundidad: ']
-
     # Note to myself, apparently around 23:30 MST class 1days dissappears
     # Try to add like a time function to change 1days to 2days in the future
-    quake1 = html.find('tr', class_ = '1days') #1days
+    #quake1 = html.find('tr', class_ = '1days') #1days
     #print(quake1.text)
-    # Prints info using id= instead of string concatenation
+
+
     # Add intesity marker (look for usgs term) green: weak, orange: medium, red: intense
-  
     # For the moment display just last day earquake list
     # Idea: Use regex to call id for multiple days, depending of user input
-    print('Último Sismo =====================================================')
-    date     = html.find(id='date_1_1').text
-    time	 = html.find(id='time_1_1').text
-    magnitud = html.find(id='mag_1_1').text
-    latitud  = html.find(id='lat_1_1').text
-    longitud = html.find(id='lon_1_1').text
-    depth	 = html.find(id='prof_1_1').text
-    location = html.find(id='epi_1_1').text
     
-    print('Fecha: ' + date)
-    print('Hora: ' + time)
-    print("Magnitud: " +  magnitud)
-    print("Epicentro --")
-    #degree Symbol = u/'00BO'
-    print("Latitud, Longitud: " + latitud + "\u00B0 , " + longitud + "\u00B0")
-    print("Localización: " + location)
-    print("Profundidad " + depth)
+    lastEarhquake()
+
     print('*******************************************************************')
+
     days = ['1days', '2days' ,'3days']
-    quakeAll = len(html.find_all('tr', class_ = days[0])) 
+    quakeAll = len(html.find_all('tr', class_ = days[0]))
     # Variables for three days =================================================
     # Sources to how to create more efficient way for multiple lists
     # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
@@ -125,19 +148,16 @@ def listEarthquake():
     rslPrf = []
     # try using half id name to verify if identiy all similar, Original: True
     # ^mag_\d+
-    # Use of lambdas maybe to avoid multiple for loops
     for tag in pool.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
         result.append(tag['id'])
 
     for tag3 in pool.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
-        rslPrf.append(tag3['id'])               
+        rslPrf.append(tag3['id'])
 
     print('=++++++++++++++++++++++++++++++++++++++++++++++')
-    # Print Multiple earthquakes 
+    # Print Multiple earthquakes
     for item in range(quakeAll):
-    	#emptyDate.extend('date1_' + item)
     	x = item + 1
-    	#print('date_1_' + str(x))
     	dateLst.append('date_1_' + str(x))
     	timeLst.append('time_1_' + str(x))
     	loctLst.append('epi_1_' + str(x))
@@ -145,7 +165,7 @@ def listEarthquake():
     	longLst.append('lon_1_' + str(x))
 
     # Test witth pretty table
-    # 
+    #
     for i in range(quakeAll):
     	magnitudes = html.find(id=result[i]).text
     	profundidades = html.find(id=rslPrf[i]).text
@@ -158,8 +178,8 @@ def listEarthquake():
     	print('Hora: ' + times)
     	print("Magnitud: " +  magnitudes)
     	print("Epicentro --")
-    	print('Latitud: ' + latitudes)
-    	print('Longitud: ' + longitudes)
+    	print('Latitud: ' + latitudes + '\u00B0')
+    	print('Longitud: ' + longitudes + '\u00B0')
     	print("Profundidad: " +  profundidades)
     	print('Localización: ' + locations)
     	print('=========================')
@@ -168,7 +188,7 @@ def listEarthquake():
     print(quakeAll) # Prints number of eathquake per days
     # ==========================================================================
 
-    #for last in quakeAll: 
+    #for last in quakeAll:
     #	dateAll = html.findAll(id='epi_1_')
     #	print(dateAll)
         #print(last.text)
