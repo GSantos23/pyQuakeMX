@@ -28,14 +28,20 @@ import re
 
 
 # TODO
-# Function that return/ask argumentrs/parameter into another functions
-# Fix list for multiple earthquakes
-# Delete unwanted code
-# Language function
+# create a  dummy method for old code, ie. oldForm() some code in here pass
+# Check PEP-8 multiline comments format
+# define good variable names
+# add url as paramter in the function to avoid multiple connections
+# reasearch about fstring format available, advantages, disadvantages
+# Add switch case/if-else to handle input of user to select between options
 # Add intensity category (either unam scale or international scale)
-# Pretty rpinting, fstring
 # Good comments
 # Executable script or leave as a module
+# Add functionality to create csv file
+# Add funcitonality to allow showList() to select day or days to display 
+# try in ubuntu/debian/windows after installing components
+# try telegram/whatsapp/signal to receive message
+# 
 
 def welcomePrinter():
     '''
@@ -92,6 +98,86 @@ def lastEarhquake():
     print('Profundidad ' + depth)
     print('===================================================================')
 
+def showList():
+	'''
+	Displays list of earquakes until now(Today)
+	No arguments
+	Returns:
+		date
+		time
+		magnitude
+		coordinates
+		depth
+		location
+	'''
+	print('*******************************************************************')
+	url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
+	unam = requests.get(url).text
+	pool = bs(unam, 'lxml')
+	result = []
+	rslPrf = []
+	days = ['1days', '2days' ,'3days']
+	quakeAll = len(pool.find_all('tr', class_ = days[0]))
+	# Variables for three days =================================================
+	# Sources to how to create more efficient way for multiple lists
+	# https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
+	# https://www.geeksforgeeks.org/python-initializing-multiple-lists/
+	dateLst = []
+	timeLst = []
+	magnLst = []
+	lattLst = []
+	longLst = []
+	profLst = []
+	epicLst = []
+	loctLst = []
+
+	# https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
+	# https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
+	# This part extract all ids from website
+	#texto = '<span id="foo"></span> <div id="bar"></div>'
+
+	# try using half id name to verify if identiy all similar, Original: True
+	# ^mag_\d+
+	for tag in pool.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
+	    result.append(tag['id'])
+
+	for tag3 in pool.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
+	    rslPrf.append(tag3['id'])
+
+	print('=++++++++++++++++++++++++++++++++++++++++++++++')
+	# Print Multiple earthquakes
+	for item in range(quakeAll):
+		x = item + 1
+		dateLst.append('date_1_' + str(x))
+		timeLst.append('time_1_' + str(x))
+		loctLst.append('epi_1_' + str(x))
+		lattLst.append('lat_1_' + str(x))
+		longLst.append('lon_1_' + str(x))
+
+	# Test witth pretty table
+	#
+	for i in range(quakeAll):
+		magnitudes = pool.find(id=result[i]).text
+		profundidades = pool.find(id=rslPrf[i]).text
+		dates = pool.find(id=dateLst[i]).text
+		times = pool.find(id=timeLst[i]).text
+		locations = pool.find(id=loctLst[i]).text
+		latitudes = pool.find(id=lattLst[i]).text
+		longitudes = pool.find(id=longLst[i]).text
+		print('Fecha: ' + dates)
+		print('Hora: ' + times)
+		print("Magnitud: " +  magnitudes)
+		print("Epicentro --")
+		print('Latitud: ' + latitudes + '\u00B0')
+		print('Longitud: ' + longitudes + '\u00B0')
+		print("Profundidad: " +  profundidades)
+		print('Localización: ' + locations)
+		print('=========================')
+
+
+	print(quakeAll) # Prints number of eathquake per days
+	# ==========================================================================	
+
 
 def listEarthquake():
 
@@ -121,72 +207,9 @@ def listEarthquake():
     # Idea: Use regex to call id for multiple days, depending of user input
     
     lastEarhquake()
+    showList()
 
-    print('*******************************************************************')
-
-    days = ['1days', '2days' ,'3days']
-    quakeAll = len(html.find_all('tr', class_ = days[0]))
-    # Variables for three days =================================================
-    # Sources to how to create more efficient way for multiple lists
-    # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
-    # https://www.geeksforgeeks.org/python-initializing-multiple-lists/
-    dateLst = []
-    timeLst = []
-    magnLst = []
-    lattLst = []
-    longLst = []
-    profLst = []
-    epicLst = []
-    loctLst = []
-
-    # https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
-    # https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
-    # This part extract all ids from website
-    #texto = '<span id="foo"></span> <div id="bar"></div>'
-    pool = bs(page, 'lxml')
-    result = []
-    rslPrf = []
-    # try using half id name to verify if identiy all similar, Original: True
-    # ^mag_\d+
-    for tag in pool.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
-        result.append(tag['id'])
-
-    for tag3 in pool.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
-        rslPrf.append(tag3['id'])
-
-    print('=++++++++++++++++++++++++++++++++++++++++++++++')
-    # Print Multiple earthquakes
-    for item in range(quakeAll):
-    	x = item + 1
-    	dateLst.append('date_1_' + str(x))
-    	timeLst.append('time_1_' + str(x))
-    	loctLst.append('epi_1_' + str(x))
-    	lattLst.append('lat_1_' + str(x))
-    	longLst.append('lon_1_' + str(x))
-
-    # Test witth pretty table
-    #
-    for i in range(quakeAll):
-    	magnitudes = html.find(id=result[i]).text
-    	profundidades = html.find(id=rslPrf[i]).text
-    	dates = html.find(id=dateLst[i]).text
-    	times = html.find(id=timeLst[i]).text
-    	locations = html.find(id=loctLst[i]).text
-    	latitudes = html.find(id=lattLst[i]).text
-    	longitudes = html.find(id=longLst[i]).text
-    	print('Fecha: ' + dates)
-    	print('Hora: ' + times)
-    	print("Magnitud: " +  magnitudes)
-    	print("Epicentro --")
-    	print('Latitud: ' + latitudes + '\u00B0')
-    	print('Longitud: ' + longitudes + '\u00B0')
-    	print("Profundidad: " +  profundidades)
-    	print('Localización: ' + locations)
-    	print('=========================')
-
-
-    print(quakeAll) # Prints number of eathquake per days
-    # ==========================================================================
+    
 
     #for last in quakeAll:
     #	dateAll = html.findAll(id='epi_1_')
