@@ -89,15 +89,15 @@ def last_earthquake(source):
     depth	 = source.find(id='prof_1_1').text
     location = source.find(id='epi_1_1').text
 
-    print('Fecha: ' + date)
-    print('Hora: ' + time)
-    print('Magnitud: ' +  magnitud)
+    print(f'Fecha: {date}')
+    print(f'Hora: {time}')
+    print(f'Magnitud: {magnitud}')
     print('Epicentro --')
-    #degree Symbol = 'u00BO'
-    print('Latitud: ' + latitud + '\u00B0')
-    print('Longitud: ' + longitud + '\u00B0')
-    print('Localización: ' + location)
-    print('Profundidad ' + depth)
+    degree_symbol = "\u00B0"
+    print(f'Latitud: {latitud}{degree_symbol}')
+    print(f'Longitud: {longitud}{degree_symbol}')
+    print(f'Localización: {location} ')
+    print(f'Profundidad {depth}')
     print('===================================================================')
 
 def show_list(source):
@@ -118,8 +118,6 @@ def show_list(source):
     url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
     unam = requests.get(url).text
     source = bs(unam, 'lxml')
-    result = []
-    rslPrf = []
     days = ['1days', '2days' ,'3days']
     quake_all = len(source.find_all('tr', class_ = days[0]))
     # Variables for three days =================================================
@@ -134,6 +132,7 @@ def show_list(source):
     prof_list = []
     epic_list = []
     loct_list = []
+    degree_symbol = "\u00B0"
 
     # https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
     # https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
@@ -168,14 +167,14 @@ def show_list(source):
         locations = source.find(id=loct_list[i]).text
         latitudes = source.find(id=latt_list[i]).text
         longitudes = source.find(id=long_list[i]).text
-        print('Fecha: ' + dates)
-        print('Hora: ' + times)
-        print("Magnitud: " +  magnitudes)
-        print("Epicentro --")
-        print('Latitud: ' + latitudes + '\u00B0')
-        print('Longitud: ' + longitudes + '\u00B0')
-        print("Profundidad: " +  profundidades)
-        print('Localización: ' + locations)
+        print(f'Fecha: {dates}')
+        print(f'Hora: {times}')
+        print(f'Magnitud: {magnitudes}')
+        print('Epicentro --')
+        print(f'Latitud: {latitudes}{degree_symbol}')
+        print(f'Longitud: {longitudes}{degree_symbol}')
+        print(f'Profundidad: {profundidades}')
+        print(f'Localización: {locations}')
         print('=========================')
 
 
@@ -214,7 +213,7 @@ def list_earthquake():
     #print(quake1.text)
 
     # Add intesity marker green: weak, orange: medium, red: intense
-    last_earthquake(html)
+    #last_earthquake(html)
     show_list(html)
     print()
     print('******************************************************************')
