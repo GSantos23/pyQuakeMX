@@ -28,7 +28,6 @@ import re
 
 
 # TODO
-# define good variable names
 # add url as paramter in the function to avoid multiple connections
 # reasearch about fstring format available, advantages, disadvantages
 # Add switch case/if-else to handle input of user to select between options
@@ -61,11 +60,11 @@ def welcome_printer():
     print('*'*45)
 
 
-def last_earthquake():
+def last_earthquake(source):
     ''' Displays last eathquake information
 
     Keyword arguments:
-    none
+    source - Allows the connection and lxml parsing to a website
 
     Returns:
     date
@@ -77,10 +76,10 @@ def last_earthquake():
     '''
 
     # Website of UNAM for earthquakes
-    url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
-    info = requests.get(url).text
+    ##url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
+    ##info = requests.get(url).text
     # Read website into code (parse)
-    source = bs(info, 'lxml')
+    ##source = bs(info, 'lxml')
     print('Último Sismo ======================================================')
     date     = source.find(id='date_1_1').text
     time	 = source.find(id='time_1_1').text
@@ -101,11 +100,11 @@ def last_earthquake():
     print('Profundidad ' + depth)
     print('===================================================================')
 
-def show_list():
+def show_list(source):
     '''Displays list of today earthquakes (to add up to 3 days)
 
     Keyword Arguments:
-    none
+    source - Allows the connection and lxml parsing to a website
 
     Returns:
     date
@@ -118,15 +117,15 @@ def show_list():
     print('*******************************************************************')
     url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
     unam = requests.get(url).text
-    pool = bs(unam, 'lxml')
+    source = bs(unam, 'lxml')
     result = []
     rslPrf = []
     days = ['1days', '2days' ,'3days']
-    quake_all = len(pool.find_all('tr', class_ = days[0]))
-	# Variables for three days =================================================
-	# Sources to how to create more efficient way for multiple lists
-	# https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
-	# https://www.geeksforgeeks.org/python-initializing-multiple-lists/
+    quake_all = len(source.find_all('tr', class_ = days[0]))
+    # Variables for three days =================================================
+    # Sources to how to create more efficient way for multiple lists
+    # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
+    # https://www.geeksforgeeks.org/python-initializing-multiple-lists/
     date_list = []
     time_list = []
     magn_list = []
@@ -136,17 +135,17 @@ def show_list():
     epic_list = []
     loct_list = []
 
-	# https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
-	# https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
-	# This part extract all ids from website
-	#texto = '<span id="foo"></span> <div id="bar"></div>'
+    # https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
+    # https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
+    # This part extract all ids from website
+    #texto = '<span id="foo"></span> <div id="bar"></div>'
 
-	# try using half id name to verify if identiy all similar, Original: True
-	# ^mag_\d+
-    for tag in pool.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
+    # try using half id name to verify if identiy all similar, Original: True
+    # ^mag_\d+
+    for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
         magn_list.append(tag['id'])
 
-    for tag3 in pool.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
+    for tag3 in source.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
         prof_list.append(tag3['id'])
 
     print('=++++++++++++++++++++++++++++++++++++++++++++++')
@@ -162,13 +161,13 @@ def show_list():
     # Test witth pretty table
     #
     for i in range(quake_all):
-        magnitudes = pool.find(id=magn_list[i]).text
-        profundidades = pool.find(id=prof_list[i]).text
-        dates = pool.find(id=date_list[i]).text
-        times = pool.find(id=time_list[i]).text
-        locations = pool.find(id=loct_list[i]).text
-        latitudes = pool.find(id=latt_list[i]).text
-        longitudes = pool.find(id=long_list[i]).text
+        magnitudes = source.find(id=magn_list[i]).text
+        profundidades = source.find(id=prof_list[i]).text
+        dates = source.find(id=date_list[i]).text
+        times = source.find(id=time_list[i]).text
+        locations = source.find(id=loct_list[i]).text
+        latitudes = source.find(id=latt_list[i]).text
+        longitudes = source.find(id=long_list[i]).text
         print('Fecha: ' + dates)
         print('Hora: ' + times)
         print("Magnitud: " +  magnitudes)
@@ -215,8 +214,8 @@ def list_earthquake():
     #print(quake1.text)
 
     # Add intesity marker green: weak, orange: medium, red: intense
-    last_earthquake()
-    show_list()
+    last_earthquake(html)
+    show_list(html)
     print()
     print('******************************************************************')
 
@@ -263,8 +262,14 @@ def old_code():
     #for last in quakeAll:
     #    print(last.text)
     #
+    #
+    # To allow single connections
+    ##url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
+    ##info = requests.get(url).text
+    # Read website into code (parse)
+    ##source = bs(info, 'lxml')
 
 
 # To allow to use the program as a module ======================================
 if __name__ == '__main__':
-	list_earthquake()
+    list_earthquake()
