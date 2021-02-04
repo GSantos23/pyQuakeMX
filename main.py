@@ -25,6 +25,7 @@ Implementations
 from bs4 import BeautifulSoup as bs
 import requests
 import re
+import sys 
 
 
 # TODO
@@ -53,9 +54,9 @@ def welcome_printer():
     print('*'*45)
     print(''' pyQuakeMX
         Selecciona una de las siguientes opciones:
-        1) Mostrar ultimo sismo
-        2) Mostrar lista de sismos
-        3) Exit
+        a) Mostrar ultimo sismo
+        b) Mostrar lista de sismos
+        c) Exit
             ''')
     print('*'*45)
 
@@ -180,8 +181,7 @@ def show_list(source):
 
     print(quake_all) # Prints number of eathquake per days
     # ==========================================================================
-
-
+    
 def list_earthquake():
     '''Main function
 
@@ -200,12 +200,25 @@ def list_earthquake():
     html = bs(page, 'lxml') # was lxml
     # To print html source code
     #print(html)
+    #
+    # use def, lambas or classes for handler siwtcher or if else
+    userInput = input('Teclea opcion: ')
 
     # Print title of website
     test = html.find('h1', class_ = 'hidden menu-title-xs')
 
     # Replace tilde issue in html
     print(test.text[:15] + 'Ó' + test.text[17:])
+
+    # Simple switch handler
+    if (userInput == 'a'):
+    	last_earthquake(html)
+    elif (userInput == 'b'):
+    	show_list(html)
+    elif (userInput == 'c'):
+    	sys.exit("Hasta la proxima")     
+    else:
+    	sys.exit("Error!. Corra nuevamente el programa usando opciones validas")   
 
     # Note to myself, apparently around 23:30 MST class 1days dissappears
     # Try to add like a time function to change 1days to 2days in the future
@@ -214,7 +227,7 @@ def list_earthquake():
 
     # Add intesity marker green: weak, orange: medium, red: intense
     #last_earthquake(html)
-    show_list(html)
+    #show_list(html)
     print()
     print('******************************************************************')
 
