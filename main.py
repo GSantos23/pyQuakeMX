@@ -25,7 +25,7 @@ Implementations
 from bs4 import BeautifulSoup as bs
 import requests
 import re
-import sys 
+import sys
 
 
 # TODO
@@ -181,7 +181,7 @@ def show_list(source):
 
     print(quake_all) # Prints number of eathquake per days
     # ==========================================================================
-    
+
 def list_earthquake():
     '''Main function
 
@@ -211,14 +211,19 @@ def list_earthquake():
     print(test.text[:15] + 'Ó' + test.text[17:])
 
     # Simple switch handler
-    if (userInput == 'a'):
-    	last_earthquake(html)
-    elif (userInput == 'b'):
-    	show_list(html)
-    elif (userInput == 'c'):
-    	sys.exit("Hasta la proxima")     
-    else:
-    	sys.exit("Error!. Corra nuevamente el programa usando opciones validas")   
+    while True:
+        if (userInput == 'a'):
+            last_earthquake(html)
+        elif (userInput == 'b'):
+            show_list(html)
+        elif (userInput == 'c'):
+            sys.exit("Hasta la proxima")
+        else:
+            sys.exit("Error!. Corra nuevamente el programa usando opciones validas")
+
+        welcome_printer()
+        userInput = input('Teclea opcion: ')
+
 
     # Note to myself, apparently around 23:30 MST class 1days dissappears
     # Try to add like a time function to change 1days to 2days in the future
