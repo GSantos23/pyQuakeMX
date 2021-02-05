@@ -1,9 +1,13 @@
 # pyQuakeMX
 Web Scrapping from Servicio Meteorologico Nacional to obtain info about earthquakes using the terminal
 
-Wishlist:
+Until now:
 
-* Last Earthquakes
-* Search by coordinates/location
-* Tsunami alert
-* Show distance from nearest earthquake to your location
+* Displays information about last earthquake in Mexico
+* Displays list of last earthquakes during the day
+
+## Requirements
+Requests
+BeautifulSoup
+
+
