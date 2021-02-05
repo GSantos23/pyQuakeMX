@@ -7,7 +7,7 @@ Until now:
 * Displays list of last earthquakes during the day
 
 ## Requirements
-Requests
-BeautifulSoup
+Check requirements.txt for user who prefer pip.
 
+You can also use your own package manager like apt, AUR, PORTAGE, etc ...
 
