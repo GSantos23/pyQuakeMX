@@ -26,6 +26,9 @@ from bs4 import BeautifulSoup as bs
 import requests
 import re
 import sys
+# Decide which library to use depending in updates from this project
+import csv
+import pandas
 
 
 # TODO
@@ -56,7 +59,8 @@ def welcome_printer():
         Selecciona una de las siguientes opciones:
         a) Mostrar ultimo sismo
         b) Mostrar lista de sismos
-        c) Exit
+        c) Generar archivo .csv 
+        d) Exit
             ''')
     print('*'*45)
 
@@ -101,8 +105,10 @@ def last_earthquake(source):
     print(f'Profundidad {depth}')
     print('===================================================================')
 
+
+
 def show_list(source):
-    '''Displays list of today earthquakes (to add up to 3 days)
+    '''Displays list of today earthquakes
 
     Keyword Arguments:
     source - Allows the connection and lxml parsing to a website
@@ -160,27 +166,45 @@ def show_list(source):
 
     # Test witth pretty table
     #
-    for i in range(quake_all):
-        magnitudes = source.find(id=magn_list[i]).text
-        profundidades = source.find(id=prof_list[i]).text
-        dates = source.find(id=date_list[i]).text
-        times = source.find(id=time_list[i]).text
-        locations = source.find(id=loct_list[i]).text
-        latitudes = source.find(id=latt_list[i]).text
-        longitudes = source.find(id=long_list[i]).text
-        print(f'Fecha: {dates}')
-        print(f'Hora: {times}')
-        print(f'Magnitud: {magnitudes}')
-        print('Epicentro --')
-        print(f'Latitud: {latitudes}{degree_symbol}')
-        print(f'Longitud: {longitudes}{degree_symbol}')
-        print(f'Profundidad: {profundidades}')
-        print(f'Localización: {locations}')
-        print('=========================')
+    with open('test2.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Fecha", "Hora", "Magnitud"])
+
+        for i in range(quake_all):
+            magnitudes = source.find(id=magn_list[i]).text
+            profundidades = source.find(id=prof_list[i]).text
+            dates = source.find(id=date_list[i]).text
+            times = source.find(id=time_list[i]).text
+            locations = source.find(id=loct_list[i]).text
+            latitudes = source.find(id=latt_list[i]).text
+            longitudes = source.find(id=long_list[i]).text
+            print(f'Fecha: {dates}')
+            print(f'Hora: {times}')
+            print(f'Magnitud: {magnitudes}')
+            print('Epicentro --')
+            print(f'Latitud: {latitudes}{degree_symbol}')
+            print(f'Longitud: {longitudes}{degree_symbol}')
+            print(f'Profundidad: {profundidades}')
+            print(f'Localización: {locations}')
+            print('=========================')
+            writer.writerow([dates, times, magnitudes])
 
 
     print(quake_all) # Prints number of eathquake per days
     # ==========================================================================
+
+def generate_csv(source):
+    '''Generates CSV file (to add up to 3 days)
+
+    Keyword Arguments:
+    source - Allows the connection and lxml parsing to a website
+
+    Returns:
+    csv file with earthquake information
+
+    '''
+    # Copy show_list without diplaying information in terminal
+    # Add option to handle 3 days
 
 def list_earthquake():
     '''Main function
@@ -217,6 +241,9 @@ def list_earthquake():
         elif (userInput == 'b'):
             show_list(html)
         elif (userInput == 'c'):
+            print('Generando archivo ......')
+            #generate_csv(html)
+        elif (userInput == 'd'):
             sys.exit("Hasta la proxima")
         else:
             sys.exit("Error!. Corra nuevamente el programa usando opciones validas")
