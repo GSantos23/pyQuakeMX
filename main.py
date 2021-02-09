@@ -32,17 +32,12 @@ import pandas
 
 
 # TODO
-# add url as paramter in the function to avoid multiple connections
-# reasearch about fstring format available, advantages, disadvantages
-# Add switch case/if-else to handle input of user to select between options
 # Add intensity category (either unam scale or international scale)
 # Good comments
 # Executable script or leave as a module
-# Add functionality to create csv file
 # Add funcitonality to allow showList() to select day or days to display
-# try in ubuntu/debian/windows after installing components
 # try telegram/whatsapp/signal to receive message
-#
+
 
 def welcome_printer():
     '''Prints a Welcome Message with options to the end user
@@ -56,11 +51,11 @@ def welcome_printer():
     '''
     print('*'*45)
     print(''' pyQuakeMX
-        Selecciona una de las siguientes opciones:
-        a) Mostrar ultimo sismo
-        b) Mostrar lista de sismos
-        c) Generar archivo .csv 
-        d) Exit
+    Selecciona una de las siguientes opciones:
+    a) Mostrar ultimo sismo
+    b) Mostrar lista de sismos
+    c) Generar archivo .csv
+    d) Exit
             ''')
     print('*'*45)
 
@@ -80,11 +75,6 @@ def last_earthquake(source):
     location
     '''
 
-    # Website of UNAM for earthquakes
-    ##url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
-    ##info = requests.get(url).text
-    # Read website into code (parse)
-    ##source = bs(info, 'lxml')
     print('Último Sismo ======================================================')
     date     = source.find(id='date_1_1').text
     time	 = source.find(id='time_1_1').text
@@ -106,7 +96,6 @@ def last_earthquake(source):
     print('===================================================================')
 
 
-
 def show_list(source):
     '''Displays list of today earthquakes
 
@@ -120,6 +109,151 @@ def show_list(source):
     coordinates
     depth
     location
+    '''
+
+    print('*******************************************************************')
+    days = ['1days', '2days' ,'3days']
+    quake_all = len(source.find_all('tr', class_ = days[0]))
+    # Variables for three days =================================================
+    # Sources to how to create more efficient way for multiple lists
+    # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
+    # https://www.geeksforgeeks.org/python-initializing-multiple-lists/
+    date_list = []
+    time_list = []
+    magn_list = []
+    latt_list = []
+    long_list = []
+    prof_list = []
+    epic_list = []
+    loct_list = []
+    degree_symbol = "\u00B0"
+
+    # https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
+    # https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
+    # This part extract all ids from website
+    #texto = '<span id="foo"></span> <div id="bar"></div>'
+
+    # try using half id name to verify if identiy all similar, Original: True
+    # ^mag_\d+
+    for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
+        magn_list.append(tag['id'])
+
+    for tag3 in source.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
+        prof_list.append(tag3['id'])
+
+    print('=++++++++++++++++++++++++++++++++++++++++++++++')
+    # Print Multiple earthquakes
+    for item in range(quake_all):
+        x = item + 1
+        date_list.append('date_1_' + str(x))
+        time_list.append('time_1_' + str(x))
+        loct_list.append('epi_1_' + str(x))
+        latt_list.append('lat_1_' + str(x))
+        long_list.append('lon_1_' + str(x))
+
+
+    for i in range(quake_all):
+        magnitudes = source.find(id=magn_list[i]).text
+        profundidades = source.find(id=prof_list[i]).text
+        dates = source.find(id=date_list[i]).text
+        times = source.find(id=time_list[i]).text
+        locations = source.find(id=loct_list[i]).text
+        latitudes = source.find(id=latt_list[i]).text
+        longitudes = source.find(id=long_list[i]).text
+        print(f'Fecha: {dates}')
+        print(f'Hora: {times}')
+        print(f'Magnitud: {magnitudes}')
+        print('Epicentro --')
+        print(f'Latitud: {latitudes}{degree_symbol}')
+        print(f'Longitud: {longitudes}{degree_symbol}')
+        print(f'Profundidad: {profundidades}')
+        print(f'Localización: {locations}')
+        print('=========================')
+
+
+    print(quake_all) # Prints number of eathquake per days
+    # ==========================================================================
+
+
+def generate_csv(source):
+    '''Generates CSV file (to add up to 3 days)
+
+    Keyword Arguments:
+    source - Allows the connection and lxml parsing to a website
+
+    Returns:
+    csv file with earthquake information
+
+    '''
+
+    days = ['1days', '2days' ,'3days']
+    quake_all = len(source.find_all('tr', class_ = days[0]))
+    # Variables for three days =================================================
+    # Sources to how to create more efficient way for multiple lists
+    # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
+    # https://www.geeksforgeeks.org/python-initializing-multiple-lists/
+    date_list = []
+    time_list = []
+    magn_list = []
+    latt_list = []
+    long_list = []
+    prof_list = []
+    epic_list = []
+    loct_list = []
+
+    # https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
+    # https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
+    # This part extract all ids from website
+    #texto = '<span id="foo"></span> <div id="bar"></div>'
+
+    # try using half id name to verify if identiy all similar, Original: True
+    # ^mag_\d+
+    for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
+        magn_list.append(tag['id'])
+
+    for tag3 in source.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
+        prof_list.append(tag3['id'])
+
+    print('=++++++++++++++++++++++++++++++++++++++++++++++')
+
+    # Add condition to for loop to detect when item of a list is over detect
+    # the follow item of the list
+    # Print Multiple earthquakes
+    for item in range(quake_all):
+        x = item + 1
+        date_list.append('date_1_' + str(x))
+        time_list.append('time_1_' + str(x))
+        loct_list.append('epi_1_' + str(x))
+        latt_list.append('lat_1_' + str(x))
+        long_list.append('lon_1_' + str(x))
+
+    # Test with pandas =========================================================
+    
+    with open('test2.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Fecha", "Hora", "Magnitud", "Latitud", "Longitud", "Lugar", "Profundidad"])
+
+        for i in range(quake_all):
+            magnitudes = source.find(id=magn_list[i]).text
+            profundidades = source.find(id=prof_list[i]).text
+            dates = source.find(id=date_list[i]).text
+            times = source.find(id=time_list[i]).text
+            locations = source.find(id=loct_list[i]).text
+            latitudes = source.find(id=latt_list[i]).text
+            longitudes = source.find(id=long_list[i]).text
+            writer.writerow([dates, times, magnitudes, latitudes, longitudes, locations, profundidades])
+
+    # ==========================================================================
+
+
+def list_earthquake():
+    '''Main function
+
+    Keyword Arguments:
+        none
+
+    Returns:
+        * Information related to last earthquake in Mexico
     '''
     print('*******************************************************************')
     url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
@@ -164,57 +298,6 @@ def show_list(source):
         latt_list.append('lat_1_' + str(x))
         long_list.append('lon_1_' + str(x))
 
-    # Test witth pretty table
-    #
-    with open('test2.csv', 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Fecha", "Hora", "Magnitud"])
-
-        for i in range(quake_all):
-            magnitudes = source.find(id=magn_list[i]).text
-            profundidades = source.find(id=prof_list[i]).text
-            dates = source.find(id=date_list[i]).text
-            times = source.find(id=time_list[i]).text
-            locations = source.find(id=loct_list[i]).text
-            latitudes = source.find(id=latt_list[i]).text
-            longitudes = source.find(id=long_list[i]).text
-            print(f'Fecha: {dates}')
-            print(f'Hora: {times}')
-            print(f'Magnitud: {magnitudes}')
-            print('Epicentro --')
-            print(f'Latitud: {latitudes}{degree_symbol}')
-            print(f'Longitud: {longitudes}{degree_symbol}')
-            print(f'Profundidad: {profundidades}')
-            print(f'Localización: {locations}')
-            print('=========================')
-            writer.writerow([dates, times, magnitudes])
-
-
-    print(quake_all) # Prints number of eathquake per days
-    # ==========================================================================
-
-def generate_csv(source):
-    '''Generates CSV file (to add up to 3 days)
-
-    Keyword Arguments:
-    source - Allows the connection and lxml parsing to a website
-
-    Returns:
-    csv file with earthquake information
-
-    '''
-    # Copy show_list without diplaying information in terminal
-    # Add option to handle 3 days
-
-def list_earthquake():
-    '''Main function
-
-    Keyword Arguments:
-        none
-
-    Returns:
-        * Information related to last earthquake in Mexico
-    '''
 
     welcome_printer()
     url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
@@ -242,7 +325,7 @@ def list_earthquake():
             show_list(html)
         elif (userInput == 'c'):
             print('Generando archivo ......')
-            #generate_csv(html)
+            generate_csv(html)
         elif (userInput == 'd'):
             sys.exit("Hasta la proxima")
         else:
