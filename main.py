@@ -14,22 +14,17 @@ Implementations
 *    = To try first
 
 [X] Display last earthquake
-[~] Display list of earquakes (around 3 days)
+[X] Display list of earquakes
 [] Display intensity chart  (or just show unam scale from parser)
-[] Create CSV file for data
+[X] Create CSV file for data
 * Send notification via sms/discord/signal/telegram about earthquake in fav zone
 * Fav Zone will be a file where you put preferred location
 '''
 
 # Call necessary libraries
-from bs4 import BeautifulSoup as bs
-import requests
-import re
-import sys
 # Decide which library to use depending in updates from this project
-import csv
-import pandas
-
+from bs4 import BeautifulSoup as bs
+import csv, pandas, re, requests, sys
 
 # TODO
 # Add intensity category (either unam scale or international scale)
@@ -231,7 +226,8 @@ def generate_csv(source):
     
     with open('test2.csv', 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["Fecha", "Hora", "Magnitud", "Latitud", "Longitud", "Lugar", "Profundidad"])
+        writer.writerow(["Fecha", "Hora", "Magnitud", "Latitud", "Longitud",
+         "Lugar", "Profundidad"])
 
         for i in range(quake_all):
             magnitudes = source.find(id=magn_list[i]).text
@@ -241,12 +237,13 @@ def generate_csv(source):
             locations = source.find(id=loct_list[i]).text
             latitudes = source.find(id=latt_list[i]).text
             longitudes = source.find(id=long_list[i]).text
-            writer.writerow([dates, times, magnitudes, latitudes, longitudes, locations, profundidades])
+            writer.writerow([dates, times, magnitudes, latitudes, longitudes,
+             locations, profundidades])
 
     # ==========================================================================
 
 
-def list_earthquake():
+def main():
     '''Main function
 
     Keyword Arguments:
@@ -261,42 +258,6 @@ def list_earthquake():
     source = bs(unam, 'lxml')
     days = ['1days', '2days' ,'3days']
     quake_all = len(source.find_all('tr', class_ = days[0]))
-    # Variables for three days =================================================
-    # Sources to how to create more efficient way for multiple lists
-    # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
-    # https://www.geeksforgeeks.org/python-initializing-multiple-lists/
-    date_list = []
-    time_list = []
-    magn_list = []
-    latt_list = []
-    long_list = []
-    prof_list = []
-    epic_list = []
-    loct_list = []
-    degree_symbol = "\u00B0"
-
-    # https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
-    # https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
-    # This part extract all ids from website
-    #texto = '<span id="foo"></span> <div id="bar"></div>'
-
-    # try using half id name to verify if identiy all similar, Original: True
-    # ^mag_\d+
-    for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
-        magn_list.append(tag['id'])
-
-    for tag3 in source.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
-        prof_list.append(tag3['id'])
-
-    print('=++++++++++++++++++++++++++++++++++++++++++++++')
-    # Print Multiple earthquakes
-    for item in range(quake_all):
-        x = item + 1
-        date_list.append('date_1_' + str(x))
-        time_list.append('time_1_' + str(x))
-        loct_list.append('epi_1_' + str(x))
-        latt_list.append('lat_1_' + str(x))
-        long_list.append('lon_1_' + str(x))
 
 
     welcome_printer()
@@ -307,8 +268,7 @@ def list_earthquake():
     html = bs(page, 'lxml') # was lxml
     # To print html source code
     #print(html)
-    #
-    # use def, lambas or classes for handler siwtcher or if else
+    
     userInput = input('Teclea opcion: ')
 
     # Print title of website
@@ -334,15 +294,6 @@ def list_earthquake():
         welcome_printer()
         userInput = input('Teclea opcion: ')
 
-
-    # Note to myself, apparently around 23:30 MST class 1days dissappears
-    # Try to add like a time function to change 1days to 2days in the future
-    #quake1 = html.find('tr', class_ = '1days') #1days
-    #print(quake1.text)
-
-    # Add intesity marker green: weak, orange: medium, red: intense
-    #last_earthquake(html)
-    #show_list(html)
     print()
     print('******************************************************************')
 
@@ -362,7 +313,7 @@ def old_code():
     #print(last.text)
     #print(dateAll.text)
     '''
-    # OLD WAY
+    # OLD WAY ##################################################################
     date      =	info[0] + quake1.text[5:16]
     magnitude = info[1] + quake1.text[1:4]
     time 	  = info[2] + quake1.text[27:35]
@@ -384,19 +335,25 @@ def old_code():
     print(''.join(depth))
     '''
 
-    # Print Multiple earthquakes
+    # Print Multiple earthquakes ###############################################
     #quakeAll = html.find_all('tr')
     #for last in quakeAll:
     #    print(last.text)
-    #
-    #
-    # To allow single connections
+    # To allow single connections ##############################################
     ##url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
     ##info = requests.get(url).text
     # Read website into code (parse)
     ##source = bs(info, 'lxml')
+    ###########################################################################
+    # Note to myself, apparently around 23:30 MST class 1days dissappears
+    # Try to add like a time function to change 1days to 2days in the future
+    #quake1 = html.find('tr', class_ = '1days') #1days
+    #print(quake1.text)
+    # Add intesity marker green: weak, orange: medium, red: intense
+    #last_earthquake(html)
+    #show_list(html)
 
 
 # To allow to use the program as a module ======================================
 if __name__ == '__main__':
-    list_earthquake()
+    main()
