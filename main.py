@@ -138,7 +138,8 @@ def show_list(source):
 
     print('=++++++++++++++++++++++++++++++++++++++++++++++')
     # Print Multiple earthquakes
-    for item in range(quake_all):
+    #  previous variable quakeall
+    for item in range(total_quakes):
         x = item + 1
         date_list.append('date_1_' + str(x))
         time_list.append('time_1_' + str(x))
@@ -183,6 +184,16 @@ def generate_csv(source):
 
     days = ['1days', '2days' ,'3days']
     quake_all = len(source.find_all('tr', class_ = days[0]))
+    quake_1st = len(source.find_all('tr', class_ = days[0]))
+    quake_2nd = len(source.find_all('tr', class_ = days[1]))
+    quake_3rd = len(source.find_all('tr', class_ = days[2]))
+
+    # Quick test for each earthquake for three days
+    total_quakes = quake_1st + quake_2nd + quake_3rd
+    print(f'day1 = {quake_1st}')
+    print(f'day2 = {quake_2nd}')
+    print(f'day3 = {quake_3rd}')
+    print(f'total {total_quakes}')
     # Variables for three days =================================================
     # Sources to how to create more efficient way for multiple lists
     # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
@@ -211,34 +222,49 @@ def generate_csv(source):
 
     print('=++++++++++++++++++++++++++++++++++++++++++++++')
 
-    # Add condition to for loop to detect when item of a list is over detect
-    # the follow item of the list
-    # Print Multiple earthquakes
-    for item in range(quake_all):
-        x = item + 1
-        date_list.append('date_1_' + str(x))
-        time_list.append('time_1_' + str(x))
-        loct_list.append('epi_1_' + str(x))
-        latt_list.append('lat_1_' + str(x))
-        long_list.append('lon_1_' + str(x))
+    day1 = 0
+    day2 = 0
+    day3 = 0
+    # try source.findAll regex for date_1_, date_2_,date_3_ to generate 3 lists
+    # try iether itertool or a single loop for those lists
 
+    # Print Multiple earthquakes to csv file
+    for item in range(quake_1st):
+        day1 = day1 + 1
+        date_list.append('date_1_' + str(day1))
+        #time_list.append('time_1_' + str(day1))
+        #loct_list.append('epi_1_' + str(day1))
+        #latt_list.append('lat_1_' + str(day1))
+        #long_list.append('lon_1_' + str(day1))
+
+    for item2 in range(quake_2nd):
+        day2 = day2 + 1
+        date_list.append('date_2_' + str(day2))
+
+    for item3 in range(quake_3rd):
+        day3 = day3 + 1
+        date_list.append('date_3_' + str(day3))
+
+    print('date_list ' + str(len(date_list)))
     # Test with pandas =========================================================
-    
+
     with open('test2.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Fecha", "Hora", "Magnitud", "Latitud", "Longitud",
          "Lugar", "Profundidad"])
 
-        for i in range(quake_all):
-            magnitudes = source.find(id=magn_list[i]).text
-            profundidades = source.find(id=prof_list[i]).text
+        # quake_all
+        for i in range(total_quakes):
+            #magnitudes = source.find(id=magn_list[i]).text
+            #profundidades = source.find(id=prof_list[i]).text
             dates = source.find(id=date_list[i]).text
-            times = source.find(id=time_list[i]).text
-            locations = source.find(id=loct_list[i]).text
-            latitudes = source.find(id=latt_list[i]).text
-            longitudes = source.find(id=long_list[i]).text
-            writer.writerow([dates, times, magnitudes, latitudes, longitudes,
-             locations, profundidades])
+            #times = source.find(id=time_list[i]).text
+            #locations = source.find(id=loct_list[i]).text
+            #latitudes = source.find(id=latt_list[i]).text
+            #longitudes = source.find(id=long_list[i]).text
+            writer.writerow([dates])
+            #writer.writerow([dates, times, magnitudes, latitudes, longitudes,
+            # locations, profundidades])
 
     # ==========================================================================
 
@@ -259,7 +285,6 @@ def main():
     days = ['1days', '2days' ,'3days']
     quake_all = len(source.find_all('tr', class_ = days[0]))
 
-
     welcome_printer()
     url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
     page = requests.get(url).text
@@ -268,7 +293,7 @@ def main():
     html = bs(page, 'lxml') # was lxml
     # To print html source code
     #print(html)
-    
+
     userInput = input('Teclea opcion: ')
 
     # Print title of website
