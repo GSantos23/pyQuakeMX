@@ -17,20 +17,18 @@ Implementations
 [X] Display list of earquakes
 [] Display intensity chart  (or just show unam scale from parser)
 [X] Create CSV file for data
-* Send notification via sms/discord/signal/telegram about earthquake in fav zone
-* Fav Zone will be a file where you put preferred location
+* Send notification via sms/discord/signal/telegram about earthquake
 '''
 
 # Call necessary libraries
 # Decide which library to use depending in updates from this project
 from bs4 import BeautifulSoup as bs
-import csv, pandas, re, requests, sys
+import csv, itertools, pandas, re, requests, sys
 
 # TODO
 # Add intensity category (either unam scale or international scale)
 # Good comments
 # Executable script or leave as a module
-# Add funcitonality to allow showList() to select day or days to display
 # try telegram/whatsapp/signal to receive message
 
 
@@ -138,7 +136,6 @@ def show_list(source):
 
     print('=++++++++++++++++++++++++++++++++++++++++++++++')
     # Print Multiple earthquakes
-    #  previous variable quakeall
     for item in range(total_quakes):
         x = item + 1
         date_list.append('date_1_' + str(x))
@@ -214,38 +211,69 @@ def generate_csv(source):
 
     # try using half id name to verify if identiy all similar, Original: True
     # ^mag_\d+
+    day1_list = []
+    day2_list = []
+    day3_list = []
+
     for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
         magn_list.append(tag['id'])
+
+    for tagi in source.findAll('td',{'id':re.compile('^mag_2_\d+')}) :
+        magn_list.append(tagi['id'])
+
+    for tagii in source.findAll('td',{'id':re.compile('^mag_3_\d+')}) :
+        magn_list.append(tagii['id'])
 
     for tag3 in source.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
         prof_list.append(tag3['id'])
 
+    for tag3i in source.findAll('td',{'id':re.compile('^prof_2_\d+')}) :
+        prof_list.append(tag3i['id'])
+
+    for tag3ii in source.findAll('td',{'id':re.compile('^prof_3_\d+')}) :
+        prof_list.append(tag3ii['id'])
+
+    for tag_day1 in source.findAll('tr',{'id':re.compile('^1day_\d+')}) :
+        day1_list.append(tag_day1['id'])
+
+    for tag_day2 in source.findAll('tr',{'id':re.compile('^2day_\d+')}) :
+        day2_list.append(tag_day2['id'])
+
+    for tag_day3 in source.findAll('tr',{'id':re.compile('^3day_\d+')}) :
+        day3_list.append(tag_day3['id'])
+
+
     print('=++++++++++++++++++++++++++++++++++++++++++++++')
 
-    day1 = 0
-    day2 = 0
-    day3 = 0
-    # try source.findAll regex for date_1_, date_2_,date_3_ to generate 3 lists
-    # try iether itertool or a single loop for those lists
+    day1 = 1
+    day2 = 1
+    day3 = 1
 
-    # Print Multiple earthquakes to csv file
-    for item in range(quake_1st):
-        day1 = day1 + 1
-        date_list.append('date_1_' + str(day1))
-        #time_list.append('time_1_' + str(day1))
-        #loct_list.append('epi_1_' + str(day1))
-        #latt_list.append('lat_1_' + str(day1))
-        #long_list.append('lon_1_' + str(day1))
+    # emulate switch case
+    for item in range(total_quakes):
+        if item < quake_1st:
+            date_list.append('date_1_' + str(day1))
+            time_list.append('time_1_' + str(day1))
+            loct_list.append('epi_1_' + str(day1))
+            latt_list.append('lat_1_' + str(day1))
+            long_list.append('lon_1_' + str(day1))
+            day1 = day1 + 1
+        elif item < (quake_1st + quake_2nd):
+            date_list.append('date_2_' + str(day2))
+            time_list.append('time_2_' + str(day2))
+            loct_list.append('epi_2_' + str(day2))
+            latt_list.append('lat_2_' + str(day2))
+            long_list.append('lon_2_' + str(day2))
+            day2 = day2 + 1
+        elif item < (quake_1st + quake_2nd + quake_3rd):
+            date_list.append('date_3_' + str(day3))
+            time_list.append('time_3_' + str(day3))
+            loct_list.append('epi_3_' + str(day3))
+            latt_list.append('lat_3_' + str(day3))
+            long_list.append('lon_3_' + str(day3))
+            day3 = day3 + 1
 
-    for item2 in range(quake_2nd):
-        day2 = day2 + 1
-        date_list.append('date_2_' + str(day2))
-
-    for item3 in range(quake_3rd):
-        day3 = day3 + 1
-        date_list.append('date_3_' + str(day3))
-
-    print('date_list ' + str(len(date_list)))
+    #print(date_list)
     # Test with pandas =========================================================
 
     with open('test2.csv', 'w', newline='') as file:
@@ -253,18 +281,17 @@ def generate_csv(source):
         writer.writerow(["Fecha", "Hora", "Magnitud", "Latitud", "Longitud",
          "Lugar", "Profundidad"])
 
-        # quake_all
+
         for i in range(total_quakes):
-            #magnitudes = source.find(id=magn_list[i]).text
-            #profundidades = source.find(id=prof_list[i]).text
+            magnitudes = source.find(id=magn_list[i]).text
+            profundidades = source.find(id=prof_list[i]).text
             dates = source.find(id=date_list[i]).text
-            #times = source.find(id=time_list[i]).text
-            #locations = source.find(id=loct_list[i]).text
-            #latitudes = source.find(id=latt_list[i]).text
-            #longitudes = source.find(id=long_list[i]).text
-            writer.writerow([dates])
-            #writer.writerow([dates, times, magnitudes, latitudes, longitudes,
-            # locations, profundidades])
+            times = source.find(id=time_list[i]).text
+            locations = source.find(id=loct_list[i]).text
+            latitudes = source.find(id=latt_list[i]).text
+            longitudes = source.find(id=long_list[i]).text
+            writer.writerow([dates, times, magnitudes, latitudes, longitudes,
+             locations, profundidades])
 
     # ==========================================================================
 
@@ -377,6 +404,27 @@ def old_code():
     # Add intesity marker green: weak, orange: medium, red: intense
     #last_earthquake(html)
     #show_list(html)
+    ############################################################################
+    ''' This part works already
+    # Print Multiple earthquakes to csv file
+    for item in range(quake_1st):
+        day1 = day1 + 1
+        date_list.append('date_1_' + str(day1))
+        #time_list.append('time_1_' + str(day1))
+        #loct_list.append('epi_1_' + str(day1))
+        #latt_list.append('lat_1_' + str(day1))
+        #long_list.append('lon_1_' + str(day1))
+
+    for item2 in range(quake_2nd):
+        day2 = day2 + 1
+        date_list.append('date_2_' + str(day2))
+
+    for item3 in range(quake_3rd):
+        day3 = day3 + 1
+        date_list.append('date_3_' + str(day3))
+
+    print('date_list ' + str(len(date_list)))
+    '''
 
 
 # To allow to use the program as a module ======================================
