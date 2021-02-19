@@ -15,20 +15,16 @@ Implementations
 
 [X] Display last earthquake
 [X] Display list of earquakes
-[] Display intensity chart  (or just show unam scale from parser)
 [X] Create CSV file for data
 * Send notification via sms/discord/signal/telegram about earthquake
 '''
 
 # Call necessary libraries
-# Decide which library to use depending in updates from this project
 from bs4 import BeautifulSoup as bs
-import csv, itertools, pandas, re, requests, sys
+import csv, re, requests, sys
 
 # TODO
-# Add intensity category (either unam scale or international scale)
 # Good comments
-# Executable script or leave as a module
 # try telegram/whatsapp/signal to receive message
 
 
@@ -42,6 +38,7 @@ def welcome_printer():
     A message with options to enable tobenamedfunction()
 
     '''
+
     print('*'*45)
     print(''' pyQuakeMX
     Selecciona una de las siguientes opciones:
@@ -105,12 +102,10 @@ def show_list(source):
     '''
 
     print('*******************************************************************')
-    days = ['1days', '2days' ,'3days']
+    days = ['1days']
     quake_all = len(source.find_all('tr', class_ = days[0]))
-    # Variables for three days =================================================
-    # Sources to how to create more efficient way for multiple lists
-    # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
-    # https://www.geeksforgeeks.org/python-initializing-multiple-lists/
+
+    # Lists to hold earthquakes information
     date_list = []
     time_list = []
     magn_list = []
@@ -120,11 +115,6 @@ def show_list(source):
     epic_list = []
     loct_list = []
     degree_symbol = "\u00B0"
-
-    # https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
-    # https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
-    # This part extract all ids from website
-    #texto = '<span id="foo"></span> <div id="bar"></div>'
 
     # try using half id name to verify if identiy all similar, Original: True
     # ^mag_\d+
@@ -136,7 +126,7 @@ def show_list(source):
 
     print('=++++++++++++++++++++++++++++++++++++++++++++++')
     # Print Multiple earthquakes
-    for item in range(total_quakes):
+    for item in range(quake_all):
         x = item + 1
         date_list.append('date_1_' + str(x))
         time_list.append('time_1_' + str(x))
@@ -180,21 +170,17 @@ def generate_csv(source):
     '''
 
     days = ['1days', '2days' ,'3days']
-    quake_all = len(source.find_all('tr', class_ = days[0]))
     quake_1st = len(source.find_all('tr', class_ = days[0]))
     quake_2nd = len(source.find_all('tr', class_ = days[1]))
     quake_3rd = len(source.find_all('tr', class_ = days[2]))
 
     # Quick test for each earthquake for three days
     total_quakes = quake_1st + quake_2nd + quake_3rd
-    print(f'day1 = {quake_1st}')
-    print(f'day2 = {quake_2nd}')
-    print(f'day3 = {quake_3rd}')
-    print(f'total {total_quakes}')
+    #print(f'day1 = {quake_1st}')
+    #print(f'day2 = {quake_2nd}')
+    #print(f'day3 = {quake_3rd}')
+    #print(f'total {total_quakes}')
     # Variables for three days =================================================
-    # Sources to how to create more efficient way for multiple lists
-    # https://stackoverflow.com/questions/2402646/python-initializing-multiple-lists-line
-    # https://www.geeksforgeeks.org/python-initializing-multiple-lists/
     date_list = []
     time_list = []
     magn_list = []
@@ -215,23 +201,11 @@ def generate_csv(source):
     day2_list = []
     day3_list = []
 
-    for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
+    for tag in source.findAll('td',{'id':re.compile('^mag_\d+')}) :
         magn_list.append(tag['id'])
 
-    for tagi in source.findAll('td',{'id':re.compile('^mag_2_\d+')}) :
-        magn_list.append(tagi['id'])
-
-    for tagii in source.findAll('td',{'id':re.compile('^mag_3_\d+')}) :
-        magn_list.append(tagii['id'])
-
-    for tag3 in source.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
+    for tag3 in source.findAll('td',{'id':re.compile('^prof_\d+')}) :
         prof_list.append(tag3['id'])
-
-    for tag3i in source.findAll('td',{'id':re.compile('^prof_2_\d+')}) :
-        prof_list.append(tag3i['id'])
-
-    for tag3ii in source.findAll('td',{'id':re.compile('^prof_3_\d+')}) :
-        prof_list.append(tag3ii['id'])
 
     for tag_day1 in source.findAll('tr',{'id':re.compile('^1day_\d+')}) :
         day1_list.append(tag_day1['id'])
@@ -273,14 +247,12 @@ def generate_csv(source):
             long_list.append('lon_3_' + str(day3))
             day3 = day3 + 1
 
-    #print(date_list)
-    # Test with pandas =========================================================
-
-    with open('test2.csv', 'w', newline='') as file:
+    # Pandas only if >1K Rows
+    # https://stackoverflow.com/questions/62139040/python-csv-module-vs-pandas
+    with open('earthquakeList.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Fecha", "Hora", "Magnitud", "Latitud", "Longitud",
          "Lugar", "Profundidad"])
-
 
         for i in range(total_quakes):
             magnitudes = source.find(id=magn_list[i]).text
@@ -404,6 +376,17 @@ def old_code():
     # Add intesity marker green: weak, orange: medium, red: intense
     #last_earthquake(html)
     #show_list(html)
+    ############################################################################
+    '''
+    for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
+        magn_list.append(tag['id'])
+
+    for tagi in source.findAll('td',{'id':re.compile('^mag_2_\d+')}) :
+        magn_list.append(tagi['id'])
+
+    for tagii in source.findAll('td',{'id':re.compile('^mag_3_\d+')}) :
+        magn_list.append(tagii['id'])
+    '''
     ############################################################################
     ''' This part works already
     # Print Multiple earthquakes to csv file
