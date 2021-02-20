@@ -285,7 +285,7 @@ def main():
 
     # Parse code
     html = bs(page, 'lxml') # was lxml
-    
+
     # To print html source code
     #print(html)
 
@@ -316,94 +316,6 @@ def main():
 
     print()
     print('******************************************************************')
-
-
-def old_code():
-    ''' To hold previous code used
-
-    Keyword Arguments:
-    none
-
-    Returns:
-    none
-    '''
-    #for last in quakeAll:
-    #	dateAll = html.findAll(id='epi_1_')
-    #	print(dateAll)
-    #print(last.text)
-    #print(dateAll.text)
-    '''
-    # OLD WAY ##################################################################
-    date      =	info[0] + quake1.text[5:16]
-    magnitude = info[1] + quake1.text[1:4]
-    time 	  = info[2] + quake1.text[27:35]
-    depth     = info[5] + quake1.text[-7:-1]
-    # change to negative indexes due the fact that places have different names
-    latitute  =	info[3] + quake1.text[71:76] + quake1.text[77]
-    longitute = info[4] + quake1.text[80:86] + quake1.text[87]
-
-    #print(newMagnitude)
-    print(len(quake1.text))
-    #print(list(quake1.text).index("8"))
-    print(list(quake1.text))
-    #lst = magnitude + list(quake1.text)
-    print(''.join(date))
-    print(''.join(time))
-    print(''.join(magnitude))
-    print(''.join(latitute))
-    print(''.join(longitute))
-    print(''.join(depth))
-    '''
-
-    # Print Multiple earthquakes ###############################################
-    #quakeAll = html.find_all('tr')
-    #for last in quakeAll:
-    #    print(last.text)
-    # To allow single connections ##############################################
-    ##url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
-    ##info = requests.get(url).text
-    # Read website into code (parse)
-    ##source = bs(info, 'lxml')
-    ###########################################################################
-    # Note to myself, apparently around 23:30 MST class 1days dissappears
-    # Try to add like a time function to change 1days to 2days in the future
-    #quake1 = html.find('tr', class_ = '1days') #1days
-    #print(quake1.text)
-    # Add intesity marker green: weak, orange: medium, red: intense
-    #last_earthquake(html)
-    #show_list(html)
-    ############################################################################
-    '''
-    for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
-        magn_list.append(tag['id'])
-
-    for tagi in source.findAll('td',{'id':re.compile('^mag_2_\d+')}) :
-        magn_list.append(tagi['id'])
-
-    for tagii in source.findAll('td',{'id':re.compile('^mag_3_\d+')}) :
-        magn_list.append(tagii['id'])
-    '''
-    ############################################################################
-    ''' This part works already
-    # Print Multiple earthquakes to csv file
-    for item in range(quake_1st):
-        day1 = day1 + 1
-        date_list.append('date_1_' + str(day1))
-        #time_list.append('time_1_' + str(day1))
-        #loct_list.append('epi_1_' + str(day1))
-        #latt_list.append('lat_1_' + str(day1))
-        #long_list.append('lon_1_' + str(day1))
-
-    for item2 in range(quake_2nd):
-        day2 = day2 + 1
-        date_list.append('date_2_' + str(day2))
-
-    for item3 in range(quake_3rd):
-        day3 = day3 + 1
-        date_list.append('date_3_' + str(day3))
-
-    print('date_list ' + str(len(date_list)))
-    '''
 
 
 # To allow to use the program as a module ======================================
