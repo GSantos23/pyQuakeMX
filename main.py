@@ -8,15 +8,15 @@ Using BeautifulSoup as a webscrapping library to obtain unam data
 
 Implementations
 
-[X[] = Done
-[~]  = Half way
-[&]  = In progress
-*    = To try first
+[X 	= Done
+[~] = Half way
+[&] = In progress
+[]	= Not implemented yet
 
 [X] Display last earthquake
 [X] Display list of earquakes
 [X] Create CSV file for data
-* Send notification via sms/discord/signal/telegram about earthquake
+[] Send notification via sms/discord/signal/telegram about earthquake
 '''
 
 # Call necessary libraries
@@ -24,18 +24,17 @@ from bs4 import BeautifulSoup as bs
 import csv, re, requests, sys
 
 # TODO
-# Good comments
 # try telegram/whatsapp/signal to receive message
 
 
 def welcome_printer():
     '''Prints a Welcome Message with options to the end user
 
-    keyword arguments:
+    Keyword arguments:
     none
 
     Returns:
-    A message with options to enable tobenamedfunction()
+    A message with options to end user
 
     '''
 
@@ -116,15 +115,16 @@ def show_list(source):
     loct_list = []
     degree_symbol = "\u00B0"
 
-    # try using half id name to verify if identiy all similar, Original: True
-    # ^mag_\d+
+    # If you pass in a regular expression object, Beautiful Soup will filter 
+    # against that regular expression using its search() method. 
+    # https://www.crummy.com/software/BeautifulSoup/bs4/doc/#a-regular-expression
     for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
         magn_list.append(tag['id'])
 
     for tag3 in source.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
         prof_list.append(tag3['id'])
 
-    print('=++++++++++++++++++++++++++++++++++++++++++++++')
+    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
     # Print Multiple earthquakes
     for item in range(quake_all):
         x = item + 1
@@ -154,8 +154,7 @@ def show_list(source):
         print('=========================')
 
 
-    print(quake_all) # Prints number of eathquake per days
-    # ==========================================================================
+    #print(quake_all) # Prints number of eathquake today
 
 
 def generate_csv(source):
@@ -190,13 +189,10 @@ def generate_csv(source):
     epic_list = []
     loct_list = []
 
-    # https://stackoverflow.com/questions/13437251/getting-id-names-with-beautifulsoup/13437437
-    # https://stackoverflow.com/questions/2830530/matching-partial-ids-in-beautifulsoup
-    # This part extract all ids from website
-    #texto = '<span id="foo"></span> <div id="bar"></div>'
+    # If you pass in a regular expression object, Beautiful Soup will filter 
+    # against that regular expression using its search() method. 
+    # https://www.crummy.com/software/BeautifulSoup/bs4/doc/#a-regular-expression
 
-    # try using half id name to verify if identiy all similar, Original: True
-    # ^mag_\d+
     day1_list = []
     day2_list = []
     day3_list = []
@@ -249,6 +245,7 @@ def generate_csv(source):
 
     # Pandas only if >1K Rows
     # https://stackoverflow.com/questions/62139040/python-csv-module-vs-pandas
+    # Use writer object and writerow() method to create csv file
     with open('earthquakeList.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Fecha", "Hora", "Magnitud", "Latitud", "Longitud",
@@ -264,8 +261,6 @@ def generate_csv(source):
             longitudes = source.find(id=long_list[i]).text
             writer.writerow([dates, times, magnitudes, latitudes, longitudes,
              locations, profundidades])
-
-    # ==========================================================================
 
 
 def main():
@@ -290,6 +285,7 @@ def main():
 
     # Parse code
     html = bs(page, 'lxml') # was lxml
+    
     # To print html source code
     #print(html)
 
