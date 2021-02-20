@@ -180,14 +180,14 @@ def generate_csv(source):
     #print(f'day3 = {quake_3rd}')
     #print(f'total {total_quakes}')
     # Variables for three days =================================================
-    date_list = []
-    time_list = []
-    magn_list = []
-    latt_list = []
-    long_list = []
-    prof_list = []
-    epic_list = []
-    loct_list = []
+    date_list_csv = []
+    time_list_csv = []
+    magn_list_csv = []
+    latt_list_csv = []
+    long_list_csv = []
+    prof_list_csv = []
+    epic_list_csv = []
+    loct_list_csv = []
 
     # If you pass in a regular expression object, Beautiful Soup will filter 
     # against that regular expression using its search() method. 
@@ -198,10 +198,10 @@ def generate_csv(source):
     day3_list = []
 
     for tag in source.findAll('td',{'id':re.compile('^mag_\d+')}) :
-        magn_list.append(tag['id'])
+        magn_list_csv.append(tag['id'])
 
     for tag3 in source.findAll('td',{'id':re.compile('^prof_\d+')}) :
-        prof_list.append(tag3['id'])
+        prof_list_csv.append(tag3['id'])
 
     for tag_day1 in source.findAll('tr',{'id':re.compile('^1day_\d+')}) :
         day1_list.append(tag_day1['id'])
@@ -222,25 +222,25 @@ def generate_csv(source):
     # emulate switch case
     for item in range(total_quakes):
         if item < quake_1st:
-            date_list.append('date_1_' + str(day1))
-            time_list.append('time_1_' + str(day1))
-            loct_list.append('epi_1_' + str(day1))
-            latt_list.append('lat_1_' + str(day1))
-            long_list.append('lon_1_' + str(day1))
+            date_list_csv.append('date_1_' + str(day1))
+            time_list_csv.append('time_1_' + str(day1))
+            loct_list_csv.append('epi_1_' + str(day1))
+            latt_list_csv.append('lat_1_' + str(day1))
+            long_list_csv.append('lon_1_' + str(day1))
             day1 = day1 + 1
         elif item < (quake_1st + quake_2nd):
-            date_list.append('date_2_' + str(day2))
-            time_list.append('time_2_' + str(day2))
-            loct_list.append('epi_2_' + str(day2))
-            latt_list.append('lat_2_' + str(day2))
-            long_list.append('lon_2_' + str(day2))
+            date_list_csv.append('date_2_' + str(day2))
+            time_list_csv.append('time_2_' + str(day2))
+            loct_list_csv.append('epi_2_' + str(day2))
+            latt_list_csv.append('lat_2_' + str(day2))
+            long_list_csv.append('lon_2_' + str(day2))
             day2 = day2 + 1
         elif item < (quake_1st + quake_2nd + quake_3rd):
-            date_list.append('date_3_' + str(day3))
-            time_list.append('time_3_' + str(day3))
-            loct_list.append('epi_3_' + str(day3))
-            latt_list.append('lat_3_' + str(day3))
-            long_list.append('lon_3_' + str(day3))
+            date_list_csv.append('date_3_' + str(day3))
+            time_list_csv.append('time_3_' + str(day3))
+            loct_list_csv.append('epi_3_' + str(day3))
+            latt_list_csv.append('lat_3_' + str(day3))
+            long_list_csv.append('lon_3_' + str(day3))
             day3 = day3 + 1
 
     # Pandas only if >1K Rows
@@ -252,13 +252,13 @@ def generate_csv(source):
          "Lugar", "Profundidad"])
 
         for i in range(total_quakes):
-            magnitudes = source.find(id=magn_list[i]).text
-            profundidades = source.find(id=prof_list[i]).text
-            dates = source.find(id=date_list[i]).text
-            times = source.find(id=time_list[i]).text
-            locations = source.find(id=loct_list[i]).text
-            latitudes = source.find(id=latt_list[i]).text
-            longitudes = source.find(id=long_list[i]).text
+            magnitudes = source.find(id=magn_list_csv[i]).text
+            profundidades = source.find(id=prof_list_csv[i]).text
+            dates = source.find(id=date_list_csv[i]).text
+            times = source.find(id=time_list_csv[i]).text
+            locations = source.find(id=loct_list_csv[i]).text
+            latitudes = source.find(id=latt_list_csv[i]).text
+            longitudes = source.find(id=long_list_csv[i]).text
             writer.writerow([dates, times, magnitudes, latitudes, longitudes,
              locations, profundidades])
 
