@@ -48,6 +48,31 @@ def welcome_printer():
             ''')
     print('*'*45)
 
+#for tag in source.findAll('td',{'id':re.compile('^mag_\d+')}) :
+#	magn_list_csv.append(tag['id'])
+# param1 = class
+# param2 = id
+# param3 = regex
+# 
+def regex_extract(source, tagName, attribute, regex):
+	''' Use regex to extract specific html tags and ids
+	
+	Keyword arguments:
+	source  	- Allows the connection and lxml parsing to a website
+	tagName 	- HTML tag <X class>  to search
+	attribute	- HTML attribute to search
+	regex 		- Regex syntax to search
+
+	Returns:
+	A list with html tags
+	'''
+	regex_list = []
+
+	for x in source.findAll(tagName, {attribute:re.compile(regex)}):
+		regex_list.append(x[attribute])
+
+	return regex_list
+
 
 def last_earthquake(source):
     ''' Displays last eathquake information
@@ -107,10 +132,8 @@ def show_list(source):
     # Lists to hold earthquakes information
     date_list = []
     time_list = []
-    magn_list = []
     latt_list = []
     long_list = []
-    prof_list = []
     epic_list = []
     loct_list = []
     degree_symbol = "\u00B0"
@@ -118,11 +141,18 @@ def show_list(source):
     # If you pass in a regular expression object, Beautiful Soup will filter 
     # against that regular expression using its search() method. 
     # https://www.crummy.com/software/BeautifulSoup/bs4/doc/#a-regular-expression
-    for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
-        magn_list.append(tag['id'])
+    mag_regex = '^mag_1_\d+'
+    prf_regex = '^prof_1_\d+'
 
-    for tag3 in source.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
-        prof_list.append(tag3['id'])
+    # Lists that contain regex extraction
+    magn_list = regex_extract(source,'td', 'id', mag_regex)
+    prof_list = regex_extract(source,'td', 'id', prf_regex)
+
+    #for tag in source.findAll('td',{'id':re.compile('^mag_1_\d+')}) :
+     #   magn_list.append(tag['id'])
+
+    #for tag3 in source.findAll('td',{'id':re.compile('^prof_1_\d+')}) :
+    #    prof_list.append(tag3['id'])
 
     print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
     # Print Multiple earthquakes
@@ -182,10 +212,8 @@ def generate_csv(source):
     # Variables for three days =================================================
     date_list_csv = []
     time_list_csv = []
-    magn_list_csv = []
     latt_list_csv = []
     long_list_csv = []
-    prof_list_csv = []
     epic_list_csv = []
     loct_list_csv = []
 
@@ -193,24 +221,24 @@ def generate_csv(source):
     # against that regular expression using its search() method. 
     # https://www.crummy.com/software/BeautifulSoup/bs4/doc/#a-regular-expression
 
-    day1_list = []
-    day2_list = []
-    day3_list = []
+    # Lists that contain regex extraction
+    magn_list_csv = regex_extract(source,'td', 'id', '^mag_\d+')
+    prof_list_csv = regex_extract(source,'td', 'id', '^prof_\d+')
 
-    for tag in source.findAll('td',{'id':re.compile('^mag_\d+')}) :
-        magn_list_csv.append(tag['id'])
+    # Remeber why I implement this part =======================================
+    #for tag_day1 in source.findAll('tr',{'id':re.compile('^1day_\d+')}) :
+    #    day1_list.append(tag_day1['id'])
 
-    for tag3 in source.findAll('td',{'id':re.compile('^prof_\d+')}) :
-        prof_list_csv.append(tag3['id'])
+    #for tag_day2 in source.findAll('tr',{'id':re.compile('^2day_\d+')}) :
+    #    day2_list.append(tag_day2['id'])
 
-    for tag_day1 in source.findAll('tr',{'id':re.compile('^1day_\d+')}) :
-        day1_list.append(tag_day1['id'])
+    #for tag_day3 in source.findAll('tr',{'id':re.compile('^3day_\d+')}) :
+    #    day3_list.append(tag_day3['id'])
 
-    for tag_day2 in source.findAll('tr',{'id':re.compile('^2day_\d+')}) :
-        day2_list.append(tag_day2['id'])
-
-    for tag_day3 in source.findAll('tr',{'id':re.compile('^3day_\d+')}) :
-        day3_list.append(tag_day3['id'])
+    #day1_list = regex_extract(source,'td', 'id', '^1day_\d+')
+    #day2_list = regex_extract(source,'td', 'id', '^2day_\d+')
+    #day3_list = regex_extract(source,'td', 'id', '^3day_\d+')
+    ##==========================================================================
 
 
     print('=++++++++++++++++++++++++++++++++++++++++++++++')
