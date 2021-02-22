@@ -21,7 +21,7 @@ Implementations
 
 # Call necessary libraries
 from bs4 import BeautifulSoup as bs
-import csv, re, requests, sys
+import csv, re, requests, sys, time
 
 # TODO
 # try telegram/whatsapp/signal to receive message
@@ -44,7 +44,7 @@ def welcome_printer():
     a) Mostrar ultimo sismo
     b) Mostrar lista de sismos
     c) Generar archivo .csv
-    d) Exit
+    q) Salir
             ''')
     print('*'*45)
 
@@ -53,25 +53,25 @@ def welcome_printer():
 # param1 = class
 # param2 = id
 # param3 = regex
-# 
+#
 def regex_extract(source, tagName, attribute, regex):
-	''' Use regex to extract specific html tags and ids
-	
-	Keyword arguments:
-	source  	- Allows the connection and lxml parsing to a website
-	tagName 	- HTML tag <X class>  to search
-	attribute	- HTML attribute to search
-	regex 		- Regex syntax to search
+    ''' Use regex to extract specific html tags and ids
 
-	Returns:
-	A list with html tags
-	'''
-	regex_list = []
+    Keyword arguments:
+    source  	- Allows the connection and lxml parsing to a website
+    tagName 	- HTML tag <X class>  to search
+    attribute	- HTML attribute to search
+    regex 		- Regex syntax to search
 
-	for x in source.findAll(tagName, {attribute:re.compile(regex)}):
-		regex_list.append(x[attribute])
+    Returns:
+    A list with html tags
+    '''
+    regex_list = []
 
-	return regex_list
+    for x in source.findAll(tagName, {attribute:re.compile(regex)}):
+            regex_list.append(x[attribute])
+
+    return regex_list
 
 
 def last_earthquake(source):
@@ -138,8 +138,8 @@ def show_list(source):
     loct_list = []
     degree_symbol = "\u00B0"
 
-    # If you pass in a regular expression object, Beautiful Soup will filter 
-    # against that regular expression using its search() method. 
+    # If you pass in a regular expression object, Beautiful Soup will filter
+    # against that regular expression using its search() method.
     # https://www.crummy.com/software/BeautifulSoup/bs4/doc/#a-regular-expression
     mag_regex = '^mag_1_\d+'
     prf_regex = '^prof_1_\d+'
@@ -217,8 +217,8 @@ def generate_csv(source):
     epic_list_csv = []
     loct_list_csv = []
 
-    # If you pass in a regular expression object, Beautiful Soup will filter 
-    # against that regular expression using its search() method. 
+    # If you pass in a regular expression object, Beautiful Soup will filter
+    # against that regular expression using its search() method.
     # https://www.crummy.com/software/BeautifulSoup/bs4/doc/#a-regular-expression
 
     # Lists that contain regex extraction
@@ -328,13 +328,22 @@ def main():
     # Simple switch handler
     while True:
         if (userInput == 'a'):
+            astart = time.perf_counter()
             last_earthquake(html)
+            astop = time.perf_counter()
+            print(f'Elapsed time: {(astop - astart):.5f} seconds')
         elif (userInput == 'b'):
+            bstart = time.perf_counter()
             show_list(html)
+            bstop = time.perf_counter()
+            print(f'Elapsed time: {(bstop - bstart):.5f} seconds')
         elif (userInput == 'c'):
+            cstart = time.perf_counter()
             print('Generando archivo ......')
             generate_csv(html)
-        elif (userInput == 'd'):
+            cstop = time.perf_counter()
+            print(f'Elapsed time: {(cstop - cstart):.5f} seconds')
+        elif (userInput == 'q'):
             sys.exit("Hasta la proxima")
         else:
             sys.exit("Error!. Corra nuevamente el programa usando opciones validas")
