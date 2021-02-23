@@ -22,6 +22,7 @@ Implementations
 # Call necessary libraries
 from bs4 import BeautifulSoup as bs
 import csv, re, requests, sys, time
+import pandas as pd
 
 # TODO
 # try telegram/whatsapp/signal to receive message
@@ -274,21 +275,140 @@ def generate_csv(source):
     # Pandas only if >1K Rows
     # https://stackoverflow.com/questions/62139040/python-csv-module-vs-pandas
     # Use writer object and writerow() method to create csv file
+    magnitudes = []
+    profundidades = []
+    dates = []
+    times = []
+    locations = []
+    latitudes = []
+    longitudes = []
+
+
     with open('earthquakeList.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Fecha", "Hora", "Magnitud", "Latitud", "Longitud",
          "Lugar", "Profundidad"])
 
+        # Difference between implementations around .20 seconds
         for i in range(total_quakes):
             magnitudes = source.find(id=magn_list_csv[i]).text
+            #magnitudes.append(source.find(id=magn_list_csv[i]).text)
             profundidades = source.find(id=prof_list_csv[i]).text
+            #profundidades.append(source.find(id=prof_list_csv[i]).text)
             dates = source.find(id=date_list_csv[i]).text
+            #dates.append(source.find(id=date_list_csv[i]).text)
             times = source.find(id=time_list_csv[i]).text
+            #times.append(source.find(id=time_list_csv[i]).text)
             locations = source.find(id=loct_list_csv[i]).text
+            #locations.append(source.find(id=loct_list_csv[i]).text)
             latitudes = source.find(id=latt_list_csv[i]).text
+            #latitudes.append(source.find(id=latt_list_csv[i]).text)
             longitudes = source.find(id=long_list_csv[i]).text
+            #longitudes.append(source.find(id=long_list_csv[i]).text)
             writer.writerow([dates, times, magnitudes, latitudes, longitudes,
              locations, profundidades])
+
+def generate_pandas(source):
+    '''Generates CSV file (to add up to 3 days)
+
+    Keyword Arguments:
+    source - Allows the connection and lxml parsing to a website
+
+    Returns:
+    csv file with earthquake information
+
+    '''
+
+    days = ['1days', '2days' ,'3days']
+    quake_1st = len(source.find_all('tr', class_ = days[0]))
+    quake_2nd = len(source.find_all('tr', class_ = days[1]))
+    quake_3rd = len(source.find_all('tr', class_ = days[2]))
+
+    # Quick test for each earthquake for three days
+    total_quakes = quake_1st + quake_2nd + quake_3rd
+
+    date_list_csv = []
+    time_list_csv = []
+    latt_list_csv = []
+    long_list_csv = []
+    epic_list_csv = []
+    loct_list_csv = []
+
+    # If you pass in a regular expression object, Beautiful Soup will filter
+    # against that regular expression using its search() method.
+    # https://www.crummy.com/software/BeautifulSoup/bs4/doc/#a-regular-expression
+
+    # Lists that contain regex extraction
+    magn_list_csv = regex_extract(source,'td', 'id', '^mag_\d+')
+    prof_list_csv = regex_extract(source,'td', 'id', '^prof_\d+')
+
+
+    print('=++++++++++++++++++++++++++++++++++++++++++++++')
+
+    day1 = 1
+    day2 = 1
+    day3 = 1
+
+    # emulate switch case
+    for item in range(total_quakes):
+        if item < quake_1st:
+            date_list_csv.append('date_1_' + str(day1))
+            time_list_csv.append('time_1_' + str(day1))
+            loct_list_csv.append('epi_1_' + str(day1))
+            latt_list_csv.append('lat_1_' + str(day1))
+            long_list_csv.append('lon_1_' + str(day1))
+            day1 = day1 + 1
+        elif item < (quake_1st + quake_2nd):
+            date_list_csv.append('date_2_' + str(day2))
+            time_list_csv.append('time_2_' + str(day2))
+            loct_list_csv.append('epi_2_' + str(day2))
+            latt_list_csv.append('lat_2_' + str(day2))
+            long_list_csv.append('lon_2_' + str(day2))
+            day2 = day2 + 1
+        elif item < (quake_1st + quake_2nd + quake_3rd):
+            date_list_csv.append('date_3_' + str(day3))
+            time_list_csv.append('time_3_' + str(day3))
+            loct_list_csv.append('epi_3_' + str(day3))
+            latt_list_csv.append('lat_3_' + str(day3))
+            long_list_csv.append('lon_3_' + str(day3))
+            day3 = day3 + 1
+
+
+    df = pd.DataFrame()
+    test_dict = {}
+
+    date_panda_list = []
+    time_panda_list = []
+    magn_panda_list = []
+    prof_panda_list = []
+    loct_panda_list = []
+    latt_panda_list = []
+    long_panda_list = []
+
+
+    for i in range(total_quakes):
+        magn_panda_list.append(source.find(id=magn_list_csv[i]).text)
+        prof_panda_list.append(source.find(id=prof_list_csv[i]).text)
+        date_panda_list.append(source.find(id=date_list_csv[i]).text)
+        time_panda_list.append(source.find(id=time_list_csv[i]).text)
+        loct_panda_list.append(source.find(id=loct_list_csv[i]).text)
+        latt_panda_list.append(source.find(id=latt_list_csv[i]).text)
+        long_panda_list.append(source.find(id=long_list_csv[i]).text)
+
+
+    test_dict = {
+                'Fecha': date_panda_list,
+                'Hora': time_panda_list,
+                'Magnitud': magn_panda_list,
+                'Latitud': latt_panda_list,
+                'Longitud': long_panda_list,
+                'Lugar': loct_panda_list,
+                'Profundidad': prof_panda_list
+    }
+
+    df = pd.DataFrame(test_dict)
+    compression_opts = dict(method='zip', archive_name='earthquakes.csv')  
+    df.to_csv('out.zip',index=False, compression=compression_opts)
 
 
 def main():
@@ -340,7 +460,8 @@ def main():
         elif (userInput == 'c'):
             cstart = time.perf_counter()
             print('Generando archivo ......')
-            generate_csv(html)
+            #generate_csv(html)
+            generate_pandas(html)
             cstop = time.perf_counter()
             print(f'Elapsed time: {(cstop - cstart):.5f} seconds')
         elif (userInput == 'q'):
