@@ -43,18 +43,14 @@ def welcome_printer():
     print(''' pyQuakeMX
     Selecciona una de las siguientes opciones:
     a) Mostrar ultimo sismo
-    b) Mostrar lista de sismos
-    c) Generar archivo .csv
+    s) Mostrar lista de sismos
+    d) Generar archivo .csv
+    f) Generar archivo .zip
     q) Salir
             ''')
     print('*'*45)
 
-#for tag in source.findAll('td',{'id':re.compile('^mag_\d+')}) :
-#	magn_list_csv.append(tag['id'])
-# param1 = class
-# param2 = id
-# param3 = regex
-#
+
 def regex_extract(source, tagName, attribute, regex):
     ''' Use regex to extract specific html tags and ids
 
@@ -272,9 +268,7 @@ def generate_csv(source):
             long_list_csv.append('lon_3_' + str(day3))
             day3 = day3 + 1
 
-    # Pandas only if >1K Rows
-    # https://stackoverflow.com/questions/62139040/python-csv-module-vs-pandas
-    # Use writer object and writerow() method to create csv file
+    # List to hold information
     magnitudes = []
     profundidades = []
     dates = []
@@ -282,7 +276,6 @@ def generate_csv(source):
     locations = []
     latitudes = []
     longitudes = []
-
 
     with open('earthquakeList.csv', 'w', newline='') as file:
         writer = csv.writer(file)
@@ -385,7 +378,6 @@ def generate_pandas(source):
     latt_panda_list = []
     long_panda_list = []
 
-
     for i in range(total_quakes):
         magn_panda_list.append(source.find(id=magn_list_csv[i]).text)
         prof_panda_list.append(source.find(id=prof_list_csv[i]).text)
@@ -394,7 +386,6 @@ def generate_pandas(source):
         loct_panda_list.append(source.find(id=loct_list_csv[i]).text)
         latt_panda_list.append(source.find(id=latt_list_csv[i]).text)
         long_panda_list.append(source.find(id=long_list_csv[i]).text)
-
 
     test_dict = {
                 'Fecha': date_panda_list,
@@ -447,24 +438,29 @@ def main():
 
     # Simple switch handler
     while True:
-        if (userInput == 'a'):
+        if (userInput == 'a' or userInput == 'A'):
             astart = time.perf_counter()
             last_earthquake(html)
             astop = time.perf_counter()
             print(f'Elapsed time: {(astop - astart):.5f} seconds')
-        elif (userInput == 'b'):
-            bstart = time.perf_counter()
+        elif (userInput == 's' or userInput == 'S'):
+            sstart = time.perf_counter()
             show_list(html)
-            bstop = time.perf_counter()
-            print(f'Elapsed time: {(bstop - bstart):.5f} seconds')
-        elif (userInput == 'c'):
-            cstart = time.perf_counter()
+            sstop = time.perf_counter()
+            print(f'Elapsed time: {(sstop - sstart):.5f} seconds')
+        elif (userInput == 'd' or userInput == 'D'):
+            dstart = time.perf_counter()
             print('Generando archivo ......')
-            #generate_csv(html)
-            generate_pandas(html)
-            cstop = time.perf_counter()
-            print(f'Elapsed time: {(cstop - cstart):.5f} seconds')
-        elif (userInput == 'q'):
+            generate_csv(html)
+            dstop = time.perf_counter()
+            print(f'Elapsed time: {(dstop - dstart):.5f} seconds')
+        elif (userInput == 'f' or userInput == 'F'):
+        	fstart = time .perf_counter()
+        	print('Comprimiendo archivo .....')
+        	generate_pandas(html)
+        	fstop = time.perf_counter()
+        	print(f'Elapsed time: {(fstop - fstart):.5f} seconds')
+        elif (userInput == 'q' or userInput == 'Q'):
             sys.exit("Hasta la proxima")
         else:
             sys.exit("Error!. Corra nuevamente el programa usando opciones validas")
