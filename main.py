@@ -5,28 +5,12 @@ This little program allow you to obtain earquake information in Mexico
 Using BeautifulSoup as a webscrapping library to obtain unam data
 
 ================================================================================
-
-Implementations
-
-[X 	= Done
-[~] = Half way
-[&] = In progress
-[]	= Not implemented yet
-
-[X] Display last earthquake
-[X] Display list of earquakes
-[X] Create CSV file for data
-[] Send notification via sms/discord/signal/telegram about earthquake
 '''
 
 # Call necessary libraries
 from bs4 import BeautifulSoup as bs
 import csv, re, requests, sys, time
 import pandas as pd
-
-# TODO
-# try telegram/whatsapp/signal to receive message
-
 
 def welcome_printer():
     '''Prints a Welcome Message with options to the end user
@@ -222,22 +206,6 @@ def generate_csv(source):
     magn_list_csv = regex_extract(source,'td', 'id', '^mag_\d+')
     prof_list_csv = regex_extract(source,'td', 'id', '^prof_\d+')
 
-    # Remeber why I implement this part =======================================
-    #for tag_day1 in source.findAll('tr',{'id':re.compile('^1day_\d+')}) :
-    #    day1_list.append(tag_day1['id'])
-
-    #for tag_day2 in source.findAll('tr',{'id':re.compile('^2day_\d+')}) :
-    #    day2_list.append(tag_day2['id'])
-
-    #for tag_day3 in source.findAll('tr',{'id':re.compile('^3day_\d+')}) :
-    #    day3_list.append(tag_day3['id'])
-
-    #day1_list = regex_extract(source,'td', 'id', '^1day_\d+')
-    #day2_list = regex_extract(source,'td', 'id', '^2day_\d+')
-    #day3_list = regex_extract(source,'td', 'id', '^3day_\d+')
-    ##==========================================================================
-
-
     print('=++++++++++++++++++++++++++++++++++++++++++++++')
 
     day1 = 1
@@ -282,22 +250,14 @@ def generate_csv(source):
         writer.writerow(["Fecha", "Hora", "Magnitud", "Latitud", "Longitud",
          "Lugar", "Profundidad"])
 
-        # Difference between implementations around .20 seconds
         for i in range(total_quakes):
             magnitudes = source.find(id=magn_list_csv[i]).text
-            #magnitudes.append(source.find(id=magn_list_csv[i]).text)
             profundidades = source.find(id=prof_list_csv[i]).text
-            #profundidades.append(source.find(id=prof_list_csv[i]).text)
-            dates = source.find(id=date_list_csv[i]).text
-            #dates.append(source.find(id=date_list_csv[i]).text)
-            times = source.find(id=time_list_csv[i]).text
-            #times.append(source.find(id=time_list_csv[i]).text)
-            locations = source.find(id=loct_list_csv[i]).text
-            #locations.append(source.find(id=loct_list_csv[i]).text)
-            latitudes = source.find(id=latt_list_csv[i]).text
-            #latitudes.append(source.find(id=latt_list_csv[i]).text)
-            longitudes = source.find(id=long_list_csv[i]).text
-            #longitudes.append(source.find(id=long_list_csv[i]).text)
+            dates = source.find(id=date_list_csv[i]).text            
+            times = source.find(id=time_list_csv[i]).text            
+            locations = source.find(id=loct_list_csv[i]).text            
+            latitudes = source.find(id=latt_list_csv[i]).text            
+            longitudes = source.find(id=long_list_csv[i]).text            
             writer.writerow([dates, times, magnitudes, latitudes, longitudes,
              locations, profundidades])
 
@@ -409,7 +369,7 @@ def main():
         none
 
     Returns:
-        * Information related to last earthquake in Mexico
+        * Information related to last earthquakes in Mexico
     '''
     print('*******************************************************************')
     url = 'http://www.ssn.unam.mx/sismicidad/ultimos/'
@@ -423,8 +383,7 @@ def main():
     page = requests.get(url).text
 
     # Parse code
-    html = bs(page, 'lxml') # was lxml
-
+    html = bs(page, 'lxml') 
     # To print html source code
     #print(html)
 
